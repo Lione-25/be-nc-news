@@ -7,3 +7,12 @@ exports.selectArticle = ({ article_id }) => {
     return checkItemExists(rows);
   });
 };
+
+exports.selectAllArticles = () => {
+  const sql = `SELECT article_id, author, title, topic, created_at, votes, article_img_url FROM 
+  articles
+  ORDER BY created_at DESC`;
+  return db.query(sql).then(({ rows }) => {
+    return rows;
+  });
+};
