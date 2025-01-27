@@ -8,9 +8,14 @@ const {
   getArticle,
   getAllArticles,
 } = require("./controllers/articles.controller");
-const { getComments } = require("./controllers/comments.controller");
+const {
+  getComments,
+  postComment,
+} = require("./controllers/comments.controller");
 
 const app = express();
+
+app.use(express.json());
 
 app.get("/api", getEndpoints);
 
@@ -21,6 +26,7 @@ app.get("/api/articles", getAllArticles);
 app.get("/api/articles/:article_id", getArticle);
 
 app.get("/api/articles/:article_id/comments", getComments);
+app.post("/api/articles/:article_id/comments", postComment);
 
 app.all("*", endpointNotFound);
 
