@@ -4,7 +4,7 @@
 
 Change the database names in the db/setup.sql file.
 
-Create the following files: `.env.development` and `.env.test` with the contents `PGDATABASE=<development_database_name>` and `PGDATABASE=<test_database_name>` respectively, with the names of your databases.
+Create the following files: `.env.development` and `.env.test` with the contents `PGDATABASE=<development_database_name>` and `PGDATABASE=<test_database_name>` respectively with the names of your databases.
 
 ---
 
