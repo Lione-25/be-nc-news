@@ -24,6 +24,17 @@ describe("GET /api", () => {
   });
 });
 
+describe("nonexistent endpoint", () => {
+  test("Responds with 404 and appropriate error message", () => {
+    return request(app)
+      .get("/api/nope")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Endpoint not found");
+      });
+  });
+});
+
 describe("GET /api/topics", () => {
   test("200: Responds with an array of topic objects", () => {
     return request(app)
