@@ -1,5 +1,8 @@
 const express = require("express");
-const { getEndpoints } = require("./controllers/endpoints.controller");
+const {
+  getEndpoints,
+  endpointNotFound,
+} = require("./controllers/endpoints.controller");
 const { getTopics } = require("./controllers/topics.controller");
 const {
   getArticle,
@@ -15,6 +18,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticle);
 
 app.get("/api/articles", getAllArticles);
+
+app.all("*", endpointNotFound);
 
 app.use((err, req, res, next) => {
   const { msg, status } = err;
