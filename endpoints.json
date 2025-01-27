@@ -56,5 +56,25 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds comment to article",
+    "queries": [],
+    "exampleBody": {
+      "username": "lurker",
+      "body": "git push origin master"
+    },
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 10,
+          "body": "git push origin master",
+          "article_id": 3,
+          "author": "lurker",
+          "votes": 0,
+          "created_at": "2020-06-20T07:24:00.000Z"
+        }
+      ]
+    }
   }
 }
