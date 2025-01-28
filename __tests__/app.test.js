@@ -97,12 +97,39 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSorted({ key: "created_at" });
       });
   });
-  test("400: Responds with appropriate error message when invalid query values", () => {
+  test("200: Responds with article objects filtered according to value of topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(12);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            title: expect.any(String),
+            topic: "mitch",
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
+        });
+      });
+  });
+  test("400: Responds with appropriate error message when invalid sort query values", () => {
     return request(app)
       .get("/api/articles?order=ascendingg&sort_by=123")
       .expect(400)
       .then(({ body: { error } }) => {
         expect(error).toBe("Invalid query values");
+      });
+  });
+  test("404: Responds with appropriate error message when nonexistent topic", () => {
+    return request(app)
+      .get("/api/articles?topic=123")
+      .expect(404)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Topic not found");
       });
   });
 });
