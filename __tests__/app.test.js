@@ -18,8 +18,8 @@ describe("nonexistent endpoint", () => {
     return request(app)
       .get("/api/nope")
       .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Endpoint not found");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Endpoint not found");
       });
   });
 });
@@ -105,16 +105,16 @@ describe("GET /api/articles/:article_id", () => {
     return request(app)
       .get("/api/articles/9000")
       .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not found");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Article not found");
       });
   });
   test("400: Responds with appropriate error message when invalid article id", () => {
     return request(app)
       .get("/api/articles/banana")
       .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad request");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
       });
   });
 });
@@ -147,28 +147,29 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments).toBeSorted({ key: "created_at", descending: true });
       });
   });
+  test("200: Responds with empty array when article has no comments", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(Array.isArray(comments)).toBe(true);
+        expect(comments.length).toBe(0);
+      });
+  });
   test("404: Responds with appropriate error message when nonexistent article id", () => {
     return request(app)
       .get("/api/articles/90/comments")
       .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not found");
-      });
-  });
-  test("404: Responds with appropriate error message when article has no comments", () => {
-    return request(app)
-      .get("/api/articles/4/comments")
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not found");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Article not found");
       });
   });
   test("400: Responds with appropriate error message when invalid article id", () => {
     return request(app)
       .get("/api/articles/banana/comments")
       .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad request");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
       });
   });
 });
@@ -203,8 +204,8 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/90/comments")
       .send(newComment)
       .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not found");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Article not found");
       });
   });
   test("404: Responds with appropriate error message when nonexistent username", () => {
@@ -216,8 +217,8 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/4/comments")
       .send(newComment)
       .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not found");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Username not found");
       });
   });
   test("400: Responds with appropriate error message when invalid article id", () => {
@@ -229,8 +230,8 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/banana/comments")
       .send(newComment)
       .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad request");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
       });
   });
   test("400: Responds with appropriate error message when request body is incomplete", () => {
@@ -241,8 +242,8 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/4/comments")
       .send(newComment)
       .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad request");
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
       });
   });
 });

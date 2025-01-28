@@ -1,11 +1,15 @@
 const db = require("../db/connection");
-const { checkItemExists } = require("./utils");
+const { checkValueExists } = require("./utils");
 
 exports.selectArticle = ({ article_id }) => {
-  const sql = "SELECT * FROM articles WHERE article_id = $1;";
-  return db.query(sql, [article_id]).then(({ rows }) => {
-    return checkItemExists(rows) || rows[0];
-  });
+  return checkValueExists({ article_id })
+    .then(() => {
+      const sql = "SELECT * FROM articles WHERE article_id = $1;";
+      return db.query(sql, [article_id]);
+    })
+    .then(({ rows }) => {
+      return rows[0];
+    });
 };
 
 exports.selectAllArticles = () => {
