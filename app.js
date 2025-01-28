@@ -14,6 +14,7 @@ const {
   postComment,
   deleteComment,
 } = require("./controllers/comments.controller");
+const { getUsers } = require("./controllers/users.controller");
 
 const app = express();
 
@@ -32,6 +33,8 @@ app.get("/api/articles/:article_id/comments", getComments);
 app.post("/api/articles/:article_id/comments", postComment);
 
 app.delete("/api/comments/:comment_id", deleteComment);
+
+app.get("/api/users", getUsers);
 
 app.all("*", endpointNotFound);
 
