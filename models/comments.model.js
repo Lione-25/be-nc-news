@@ -17,10 +17,7 @@ exports.selectComments = ({ article_id }) => {
 };
 
 exports.insertComment = ({ username, body }, { article_id }) => {
-  return Promise.all([
-    checkValueExists({ username }),
-    checkValueExists({ article_id }),
-  ])
+  return checkValueExists({ article_id })
     .then(() => {
       const sql = `INSERT INTO comments (author, body, article_id) 
         VALUES ($1, $2, $3) 
@@ -31,6 +28,13 @@ exports.insertComment = ({ username, body }, { article_id }) => {
     })
     .then(({ rows }) => {
       return rows[0];
+    })
+    .catch((err) => {
+      let reason = err;
+      if (err.code === "23503") {
+        reason = { status: 401, msg: "Unable to identify user" };
+      }
+      return Promise.reject(reason);
     });
 };
 

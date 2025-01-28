@@ -270,7 +270,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
   test("404: Responds with appropriate error message when nonexistent article id", () => {
-    //should this be 404 or 400???????
     const newComment = {
       username: "rogersop",
       body: "This had hoped to be a new comment...",
@@ -283,8 +282,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(error).toBe("Article not found");
       });
   });
-  test("404: Responds with appropriate error message when nonexistent username", () => {
-    //should this be 404 or 400 or 401???????
+  test("401: Responds with appropriate error message when username doesn't belong to a current user", () => {
     const newComment = {
       username: 123,
       body: "This is also a new comment...",
@@ -292,9 +290,9 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/4/comments")
       .send(newComment)
-      .expect(404)
+      .expect(401)
       .then(({ body: { error } }) => {
-        expect(error).toBe("Username not found");
+        expect(error).toBe("Unable to identify user");
       });
   });
   test("400: Responds with appropriate error message when invalid article id", () => {
