@@ -5,5 +5,5 @@ exports.getEndpoints = (req, res) => {
 };
 
 exports.endpointNotFound = (req, res) => {
-  res.status(404).send({ msg: "Endpoint not found" });
+  res.status(404).send({ error: "Endpoint not found" });
 };
