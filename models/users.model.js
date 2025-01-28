@@ -1,8 +1,6 @@
-const db = require("../db/connection");
+const { sqlReturnTable } = require("./utils");
 
 exports.selectUsers = () => {
   const sql = "SELECT * FROM users;";
-  return db.query(sql).then(({ rows }) => {
-    return rows;
-  });
+  return sqlReturnTable(sql);
 };
