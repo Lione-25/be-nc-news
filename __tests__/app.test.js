@@ -323,3 +323,34 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: Deletes comment from database", () => {
+    return request(app)
+      .delete("/api/comments/5")
+      .expect(204)
+      .then(() => {
+        const sql = "SELECT * FROM comments WHERE comment_id = 5;";
+        return db.query(sql);
+      })
+      .then(({ rows }) => {
+        expect(rows.length).toBe(0);
+      });
+  });
+  test("404: Responds with appropriate error message when nonexistent comment id", () => {
+    return request(app)
+      .delete("/api/comments/500")
+      .expect(404)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Comment not found");
+      });
+  });
+  test("400: Responds with appropriate error message when invalid comment id", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+});
