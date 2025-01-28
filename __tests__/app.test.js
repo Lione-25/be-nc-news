@@ -91,13 +91,14 @@ describe("GET /api/articles/:article_id", () => {
       .then(({ body: { article } }) => {
         expect(article).toMatchObject({
           article_id: 3,
-          author: expect.any(String),
-          title: expect.any(String),
-          body: expect.any(String),
-          topic: expect.any(String),
+          title: "Eight pug gifs that remind me of mitch",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "some gifs",
           created_at: expect.any(String),
-          votes: expect.any(Number),
-          article_img_url: expect.any(String),
+          votes: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         });
       });
   });
@@ -119,6 +120,79 @@ describe("GET /api/articles/:article_id", () => {
   });
 });
 
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with updated article object", () => {
+    const update = { inc_votes: 6 };
+    return request(app)
+      .patch("/api/articles/5")
+      .send(update)
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: 5,
+          title: "UNCOVERED: catspiracy to bring down democracy",
+          topic: "cats",
+          author: "rogersop",
+          body: "Bastet walks amongst us, and the cats are taking arms!",
+          created_at: expect.any(String),
+          votes: 6,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("200: Votes are incremented correctly when there are preexisting votes", () => {
+    const update = { inc_votes: -20 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(update)
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(80);
+      });
+  });
+  test("404: Responds with appropriate error message when nonexistent article id", () => {
+    const update = { inc_votes: -3 };
+    return request(app)
+      .patch("/api/articles/9000")
+      .send(update)
+      .expect(404)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Article not found");
+      });
+  });
+  test("400: Responds with appropriate error message when invalid article id", () => {
+    const update = { inc_votes: 2 };
+    return request(app)
+      .patch("/api/articles/banana")
+      .send(update)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+  test("400: Responds with appropriate error message when request body is incomplete", () => {
+    const update = {};
+    return request(app)
+      .patch("/api/articles/4")
+      .send(update)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+  test("400: Responds with appropriate error message when request body has invalid sql syntax", () => {
+    const update = { inc_votes: "seven" };
+    return request(app)
+      .patch("/api/articles/4")
+      .send(update)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of comment objects", () => {
     return request(app)
@@ -133,7 +207,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             created_at: expect.any(String),
             author: expect.any(String),
             body: expect.any(String),
-            article_id: expect.any(Number),
+            article_id: 3,
           });
         });
       });
@@ -196,6 +270,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
   test("404: Responds with appropriate error message when nonexistent article id", () => {
+    //should this be 404 or 400???????
     const newComment = {
       username: "rogersop",
       body: "This had hoped to be a new comment...",
@@ -209,6 +284,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
   test("404: Responds with appropriate error message when nonexistent username", () => {
+    //should this be 404 or 400 or 401???????
     const newComment = {
       username: 123,
       body: "This is also a new comment...",
