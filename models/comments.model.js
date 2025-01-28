@@ -33,3 +33,12 @@ exports.insertComment = ({ username, body }, { article_id }) => {
       return rows[0];
     });
 };
+
+exports.deleteCommentFromDb = ({ comment_id }) => {
+  return checkValueExists({ comment_id }).then(() => {
+    const sql = `DELETE FROM 
+        comments 
+        WHERE comment_id = $1;`;
+    return db.query(sql, [comment_id]);
+  });
+};

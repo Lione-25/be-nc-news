@@ -94,5 +94,8 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "delete comment from article"
   }
 }
