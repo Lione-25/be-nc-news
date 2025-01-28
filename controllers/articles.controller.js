@@ -14,8 +14,8 @@ exports.getArticle = ({ params }, res, next) => {
     });
 };
 
-exports.getAllArticles = (req, res, next) => {
-  selectAllArticles()
+exports.getAllArticles = ({ query }, res, next) => {
+  selectAllArticles(query)
     .then((articles) => {
       res.status(200).send({ articles });
     })

@@ -73,12 +73,36 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  test("200: Responds with article objects sorted by date in descending order", () => {
+  test("200: Responds with article objects sorted by date and in descending order by default", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+  test("200: Responds with article objects sorted according to value of sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSorted({ key: "votes", descending: true });
+      });
+  });
+  test("200: Responds with article objects ordered according to value of order query", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSorted({ key: "created_at" });
+      });
+  });
+  test("400: Responds with appropriate error message when invalid query values", () => {
+    return request(app)
+      .get("/api/articles?order=ascendingg&sort_by=123")
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Invalid query values");
       });
   });
 });
