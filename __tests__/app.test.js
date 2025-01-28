@@ -324,16 +324,20 @@ describe("POST /api/articles/:article_id/comments", () => {
 
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: Deletes comment from database", () => {
-    return request(app)
-      .delete("/api/comments/5")
-      .expect(204)
-      .then(() => {
-        const sql = "SELECT * FROM comments WHERE comment_id = 5;";
-        return db.query(sql);
-      })
-      .then(({ rows }) => {
-        expect(rows.length).toBe(0);
-      });
+    return (
+      request(app)
+        .delete("/api/comments/5")
+        .expect(204)
+        //Just receiving a 204 status code response is proof enough that the comment has been deleted
+        // in the context of our integration tests, as it means that the model has been invoked successfully
+        .then(() => {
+          const sql = "SELECT * FROM comments WHERE comment_id = 5;";
+          return db.query(sql);
+        })
+        .then(({ rows }) => {
+          expect(rows.length).toBe(0);
+        })
+    );
   });
   test("404: Responds with appropriate error message when nonexistent comment id", () => {
     return request(app)
