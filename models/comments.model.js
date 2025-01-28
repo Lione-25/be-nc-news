@@ -17,10 +17,6 @@ exports.selectComments = ({ article_id }) => {
 };
 
 exports.insertComment = ({ username, body }, { article_id }) => {
-  if (username === undefined || body === undefined) {
-    return Promise.reject({ status: 400, msg: "Bad request" }); //or {code: ''}==> will think its an sql error
-  }
-
   return Promise.all([
     checkValueExists({ username }),
     checkValueExists({ article_id }),
