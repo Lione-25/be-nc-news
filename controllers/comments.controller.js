@@ -1,4 +1,8 @@
-const { selectComments, insertComment } = require("../models/comments.model");
+const {
+  selectComments,
+  insertComment,
+  deleteCommentFromDb,
+} = require("../models/comments.model");
 
 exports.getComments = ({ params }, res, next) => {
   selectComments(params)
@@ -14,6 +18,16 @@ exports.postComment = ({ body, params }, res, next) => {
   insertComment(body, params)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteComment = ({ params }, res, next) => {
+  deleteCommentFromDb(params)
+    .then(() => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);
