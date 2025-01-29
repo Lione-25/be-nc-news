@@ -6,19 +6,19 @@ To run this project locally, please refer to the following instructions:
 
 ## Installation
 
-1. Clone the repository:
+####1. Clone the repository:
 
 ```
 git clone https://github.com/Lione-25/be-nc-news
 ```
 
-2. Navigate into the repository:
+####2. Navigate into the repository:
 
 ```
 cd be-nc-news
 ```
 
-3. Install dependencies:
+####3. Install dependencies:
 
 ```
 npm install
