@@ -6,19 +6,19 @@ To run this project locally, please refer to the following instructions:
 
 ## Installation
 
-#### 1. Clone the repository:
+#### Clone the repository:
 
 ```
 git clone https://github.com/Lione-25/be-nc-news
 ```
 
-#### 2. Navigate into the repository:
+#### Navigate into the repository:
 
 ```
 cd be-nc-news
 ```
 
-#### 3. Install dependencies:
+#### Install dependencies:
 
 ```
 npm install
@@ -28,7 +28,7 @@ npm install
 
 #### Change the database names in the db/setup.sql file.
 
-#### Setup local databases using the setup-dbs script:
+#### Create local databases using the setup-dbs script:
 
 ```
 npm run setup-dbs
