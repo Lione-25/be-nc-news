@@ -63,7 +63,7 @@ npm run seed
   npm run start
   ```
 
----
+
 You will need Node.js version 23.3.0 and PostgreSQL version 16.6 installed in order to run this project successfully.
 
 ---
