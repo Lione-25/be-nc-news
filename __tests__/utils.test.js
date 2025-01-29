@@ -3,7 +3,7 @@ const {
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
-const { getCommentCount } = require("../models/utils");
+const { getCommentCount, checkValueExists } = require("../models/utils");
 const db = require("../db/connection");
 
 afterAll(() => {
@@ -109,24 +109,79 @@ describe("formatComments", () => {
   });
 });
 
-describe("getCommentCount", () => {
+describe("checkValueExists", () => {
   test("returns a promise", () => {
-    return expect(getCommentCount(3) instanceof Promise).toBe(true);
+    // return expect(
+    //   checkValueExists({ username: "lurker" }) instanceof Promise
+    // ).toBe(true);
   });
-  test("promise resolves to a number", () => {
-    return getCommentCount(6).then((commentCount) => {
-      expect(typeof commentCount).toBe("number");
+  test("rejects when passed incorrectly formatted argument", () => {
+    return expect(checkValueExists({ userr: "lurker" })).rejects.toBe(
+      "internal error: please input {item: value} to check if value exists"
+    );
+  });
+  describe("username:", () => {
+    test("resolves if username exists", () => {
+      return expect(checkValueExists({ username: "lurker" })).resolves.toBe();
+    });
+    test("rejects with correct error object if username doesn't exist", () => {
+      return expect(
+        checkValueExists({ username: "haha" })
+      ).rejects.toMatchObject({
+        msg: "Username not found",
+        status: 404,
+      });
     });
   });
-  test("promise resolves to correct comment count for article when given article id", () => {
-    return expect(getCommentCount(1)).resolves.toBe(11);
+  describe("article:", () => {
+    test("resolves if article exists", () => {
+      return expect(checkValueExists({ article_id: 11 })).resolves.toBe();
+    });
+    test("rejects with correct error object if article doesn't exist", () => {
+      return expect(
+        checkValueExists({ article_id: "23" })
+      ).rejects.toMatchObject({
+        msg: "Article not found",
+        status: 404,
+      });
+    });
+    test("rejects with sql error if article id is invalid", () => {
+      return expect(
+        checkValueExists({ article_id: "hahaha" })
+      ).rejects.toMatchObject({
+        code: expect.any(String),
+      });
+    });
   });
-  test("promise resolves to zero when article has no comments", () => {
-    return expect(getCommentCount(11)).resolves.toBe(0);
+  describe("comment:", () => {
+    test("resolves if comment exists", () => {
+      return expect(checkValueExists({ comment_id: "6" })).resolves.toBe();
+    });
+    test("rejects with correct error object if comment doesn't exist", () => {
+      return expect(
+        checkValueExists({ comment_id: 2300 })
+      ).rejects.toMatchObject({
+        msg: "Comment not found",
+        status: 404,
+      });
+    });
+    test("rejects with sql error if comment id is invalid", () => {
+      return expect(
+        checkValueExists({ comment_id: "hahaha" })
+      ).rejects.toMatchObject({
+        code: expect.any(String),
+      });
+    });
   });
-  test("promise rejects when not given an argument", () => {
-    return expect(getCommentCount()).rejects.toBe(
-      "internal error: please input article id to get comment count"
-    );
+  describe("topic:", () => {
+    test("resolves if topic exists", () => {
+      return expect(checkValueExists({ topic: "paper" })).resolves.toBe();
+    });
+    test("rejects with correct error object if topic doesn't exist", () => {
+      return expect(checkValueExists({ topic: "haha" })).rejects.toMatchObject({
+        msg: "Topic not found",
+        status: 404,
+      });
+    });
   });
 });

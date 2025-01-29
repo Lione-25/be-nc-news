@@ -1,33 +1,34 @@
 const db = require("../db/connection");
 
-exports.checkValueExists = (value) => {
+exports.checkValueExists = ({ username, article_id, comment_id, topic }) => {
   let table = "";
   let column = "";
   let itemName = "";
   let args = [];
-  if (value.username) {
+  if (username) {
     table = "users";
     column = "username";
     itemName = "Username";
-    args = [value.username];
-  }
-  if (value.article_id) {
+    args = [username];
+  } else if (article_id) {
     table = "articles";
     column = "article_id";
     itemName = "Article";
-    args = [value.article_id];
-  }
-  if (value.comment_id) {
+    args = [article_id];
+  } else if (comment_id) {
     table = "comments";
     column = "comment_id";
     itemName = "Comment";
-    args = [value.comment_id];
-  }
-  if (value.topic) {
+    args = [comment_id];
+  } else if (topic) {
     table = "topics";
     column = "slug";
     itemName = "Topic";
-    args = [value.topic];
+    args = [topic];
+  } else {
+    return Promise.reject(
+      "internal error: please input {item: value} to check if value exists"
+    );
   }
   const sql = `SELECT * FROM ${table} WHERE ${column} = $1`;
   return db.query(sql, args).then(({ rows }) => {
@@ -46,17 +47,5 @@ exports.sqlReturnTable = (sql, args) => {
 exports.sqlReturnItem = (sql, args) => {
   return db.query(sql, args).then(({ rows }) => {
     return rows[0];
-  });
-};
-
-exports.getCommentCount = (article_id) => {
-  if (article_id === undefined) {
-    return Promise.reject(
-      "internal error: please input article id to get comment count"
-    );
-  }
-  const sql = `SELECT COUNT(comment_id) FROM comments WHERE article_id=$1 GROUP BY article_id;`;
-  return db.query(sql, [article_id]).then(({ rows }) => {
-    return rows[0] ? Number(rows[0].count) : 0;
   });
 };

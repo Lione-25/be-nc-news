@@ -7,13 +7,22 @@ const {
 
 exports.selectArticle = ({ article_id }) => {
   return checkValueExists({ article_id }).then(() => {
-    const sql = "SELECT * FROM articles WHERE article_id = $1;";
-    return Promise.all([
-      sqlReturnItem(sql, [article_id]),
-      getCommentCount(article_id),
-    ]).then(([article, comment_count]) => {
-      return { ...article, comment_count };
-    });
+    const sql = `SELECT 
+    articles.article_id, 
+    articles.author, 
+    title, 
+    topic, 
+    articles.body, 
+    articles.created_at, 
+    articles.votes, 
+    article_img_url, 
+    COUNT(comment_id)::INT AS comment_count 
+    FROM 
+    articles 
+    LEFT JOIN comments ON comments.article_id = articles.article_id 
+    WHERE articles.article_id = $1 
+    GROUP BY articles.article_id;`;
+    return sqlReturnItem(sql, [article_id]);
   });
 };
 
@@ -45,7 +54,15 @@ exports.selectAllArticles = ({
     });
   }
 
-  const sqlBase = `SELECT article_id, author, title, topic, created_at, votes, article_img_url FROM 
+  const sqlBase = `SELECT 
+  article_id, 
+  author, 
+  title, 
+  topic, 
+  created_at, 
+  votes, 
+  article_img_url 
+  FROM 
   articles`;
   const sqlOrder = ` ORDER BY ${sort_by} ${order};`;
   let sql = sqlBase + sqlOrder;
