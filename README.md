@@ -2,19 +2,25 @@
 
 [View the hosted version of this project here](https://nc-news-kqpq.onrender.com/api)
 
+To run this project locally, please refer to the following instructions:
+
+## Installation
+
+Clone the repository:
+`$ git clone https://github.com/Lione-25/be-nc-news`
+
+Navigate into the repository:
+`$ cd be-nc-news`
+
+Install dependencies:
+`$ npm install`
+
 ## Setup
-
-To run this project locally:
-
-Clone the repository `$ git clone https://github.com/Lione-25/be-nc-news`
-
-Navigate into the repository `$ cd be-nc-news`
-
-Install dependencies `$ npm install`
 
 Change the database names in the db/setup.sql file.
 
-Setup local databases using the setup-dbs script `$ npm run setup-dbs`
+Setup local databases using the setup-dbs script:
+`$ npm run setup-dbs`
 
 Create the following files:
 
@@ -23,9 +29,18 @@ Create the following files:
 
 These will allow you to connect to your databases locally.
 
-Seed your local development database using the seed script `$ npm run seed`
+Seed your local development database using the seed script:
+`$ npm run seed`
 
-Run tests using the test script `$ npm run test`
+## Usage
+
+Make use of the scripts provided in the package.JSON file, for example:
+
+- Run tests using the test script:
+  `$ npm run test`
+
+- Host the project locally using the start script:
+  `$ npm run start`
 
 You will need Node.js version 23.3.0 and PostgreSQL version 16.6 installed in order to run this project successfully.
 
