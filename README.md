@@ -6,7 +6,7 @@ To run this project locally, please refer to the following instructions:
 
 ## Installation
 
-#### 1. Clone the repository:
+### 1. Clone the repository:
 
 ```
 git clone https://github.com/Lione-25/be-nc-news
