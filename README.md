@@ -6,19 +6,19 @@ To run this project locally, please refer to the following instructions:
 
 ## Installation
 
-Clone the repository:
+1. Clone the repository:
 
 ```
 git clone https://github.com/Lione-25/be-nc-news
 ```
 
-Navigate into the repository:
+2. Navigate into the repository:
 
 ```
 cd be-nc-news
 ```
 
-Install dependencies:
+3. Install dependencies:
 
 ```
 npm install
@@ -26,22 +26,22 @@ npm install
 
 ## Setup
 
-Change the database names in the db/setup.sql file.
+1. Change the database names in the db/setup.sql file.
 
-Setup local databases using the setup-dbs script:
+2. Setup local databases using the setup-dbs script:
 
 ```
 npm run setup-dbs
 ```
 
-Create the following files:
+3. Create the following files:
 
 - `.env.development` with the contents `PGDATABASE=[Your development database name here]`
 - `.env.test` with the contents `PGDATABASE=[Your test database name here]`
 
 These will allow you to connect to your databases locally.
 
-Seed your local development database using the seed script:
+4. Seed your local development database using the seed script:
 
 ```
 npm run seed
