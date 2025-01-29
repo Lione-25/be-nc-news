@@ -42,8 +42,21 @@ exports.sqlReturnTable = (sql, args) => {
     return rows;
   });
 };
+
 exports.sqlReturnItem = (sql, args) => {
   return db.query(sql, args).then(({ rows }) => {
     return rows[0];
+  });
+};
+
+exports.getCommentCount = (article_id) => {
+  if (article_id === undefined) {
+    return Promise.reject(
+      "internal error: please input article id to get comment count"
+    );
+  }
+  const sql = `SELECT COUNT(comment_id) FROM comments WHERE article_id=$1 GROUP BY article_id;`;
+  return db.query(sql, [article_id]).then(({ rows }) => {
+    return rows[0] ? Number(rows[0].count) : 0;
   });
 };

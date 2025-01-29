@@ -3,6 +3,12 @@ const {
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
+const { getCommentCount } = require("../models/utils");
+const db = require("../db/connection");
+
+afterAll(() => {
+  return db.end();
+});
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -100,5 +106,27 @@ describe("formatComments", () => {
     const comments = [{ created_at: timestamp }];
     const formattedComments = formatComments(comments, {});
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
+  });
+});
+
+describe("getCommentCount", () => {
+  test("returns a promise", () => {
+    return expect(getCommentCount(3) instanceof Promise).toBe(true);
+  });
+  test("promise resolves to a number", () => {
+    return getCommentCount(6).then((commentCount) => {
+      expect(typeof commentCount).toBe("number");
+    });
+  });
+  test("promise resolves to correct comment count for article when given article id", () => {
+    return expect(getCommentCount(1)).resolves.toBe(11);
+  });
+  test("promise resolves to zero when article has no comments", () => {
+    return expect(getCommentCount(11)).resolves.toBe(0);
+  });
+  test("promise rejects when not given an argument", () => {
+    return expect(getCommentCount()).rejects.toBe(
+      "internal error: please input article id to get comment count"
+    );
   });
 });
