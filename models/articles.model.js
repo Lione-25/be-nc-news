@@ -1,9 +1,19 @@
-const { checkValueExists, sqlReturnItem, sqlReturnTable } = require("./utils");
+const {
+  checkValueExists,
+  sqlReturnItem,
+  sqlReturnTable,
+  getCommentCount,
+} = require("./utils");
 
 exports.selectArticle = ({ article_id }) => {
   return checkValueExists({ article_id }).then(() => {
     const sql = "SELECT * FROM articles WHERE article_id = $1;";
-    return sqlReturnItem(sql, [article_id]);
+    return Promise.all([
+      sqlReturnItem(sql, [article_id]),
+      getCommentCount(article_id),
+    ]).then(([article, comment_count]) => {
+      return { ...article, comment_count };
+    });
   });
 };
 
