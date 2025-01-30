@@ -433,3 +433,14 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe("ROUTES: GET /tryrouter", () => {
+  test("200: Responds with correct message", () => {
+    return request(app)
+      .get("/tryrouter")
+      .expect(200)
+      .then((res) => {
+        expect(res.text).toEqual("<h1>All OK from /api/tryrouter</h1>");
+      });
+  });
+});
