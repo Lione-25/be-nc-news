@@ -95,3 +95,26 @@ exports.updateArticle = ({ article_id }, { inc_votes }) => {
       return sqlReturnItem(sql, args);
     });
 };
+
+exports.insertArticle = ({ author, title, body, topic, article_img_url }) => {
+  return checkValueExists({ topic })
+    .then(() => {
+      const sql = `INSERT INTO articles (author, title, body, topic, article_img_url) 
+        VALUES ($1, $2, $3, $4, $5) 
+        RETURNING *;`;
+      const args = [author, title, body, topic, article_img_url];
+      return sqlReturnItem(sql, args).then((article) => {
+        return { ...article, comment_count: 0 };
+      });
+    })
+    .catch((err) => {
+      let reason = err;
+      if (err.code === "23503") {
+        reason = { status: 401, msg: "Unable to identify user" };
+      }
+      if (err.functionName === "checkValueExists") {
+        reason = { status: 400, msg: "Bad request" };
+      }
+      return Promise.reject(reason);
+    });
+};
