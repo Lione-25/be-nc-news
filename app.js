@@ -1,6 +1,5 @@
 const express = require("express");
 
-const tryRouter = require("./routes/try-router");
 const apiRouter = require("./routes/api-router");
 
 const { endpointNotFound } = require("./controllers/endpoints.controller");
@@ -8,8 +7,6 @@ const { endpointNotFound } = require("./controllers/endpoints.controller");
 const app = express();
 
 app.use(express.json());
-
-app.use("/tryrouter", tryRouter);
 
 app.use("/api", apiRouter);
 
