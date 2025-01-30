@@ -26,9 +26,10 @@ exports.checkValueExists = ({ username, article_id, comment_id, topic }) => {
     itemName = "Topic";
     args = [topic];
   } else {
-    return Promise.reject(
-      "internal error: please input {item: value} to check if value exists"
-    );
+    return Promise.reject({
+      internalError: "please input {item: value} to check if value exists",
+      functionName: "checkValueExists",
+    });
   }
   const sql = `SELECT * FROM ${table} WHERE ${column} = $1`;
   return db.query(sql, args).then(({ rows }) => {

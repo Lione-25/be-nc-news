@@ -2,6 +2,7 @@ const {
   selectArticle,
   selectAllArticles,
   updateArticle,
+  insertArticle,
 } = require("../models/articles.model");
 
 exports.getArticle = ({ params }, res, next) => {
@@ -28,6 +29,16 @@ exports.patchArticle = ({ params, body }, res, next) => {
   updateArticle(params, body)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postArticle = ({ body }, res, next) => {
+  insertArticle(body)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch((err) => {
       next(err);

@@ -116,9 +116,10 @@ describe("checkValueExists", () => {
     // ).toBe(true);
   });
   test("rejects when passed incorrectly formatted argument", () => {
-    return expect(checkValueExists({ userr: "lurker" })).rejects.toBe(
-      "internal error: please input {item: value} to check if value exists"
-    );
+    return expect(checkValueExists({ userr: "lurker" })).rejects.toMatchObject({
+      internalError: "please input {item: value} to check if value exists",
+      functionName: "checkValueExists",
+    });
   });
   describe("username:", () => {
     test("resolves if username exists", () => {
