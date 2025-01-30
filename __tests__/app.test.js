@@ -134,6 +134,92 @@ describe("GET /api/articles", () => {
   });
 });
 
+describe("POST /api/articles", () => {
+  test("201: Responds with the posted article", () => {
+    const newArticle = {
+      author: "lurker",
+      title: "Latest stuff",
+      body: "This is a new article...",
+      topic: "mitch",
+      article_img_url: "https://coolimages.com/1242213",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(201)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: expect.any(Number),
+          author: "lurker",
+          title: "Latest stuff",
+          body: "This is a new article...",
+          topic: "mitch",
+          article_img_url: "https://coolimages.com/1242213",
+          created_at: expect.any(String),
+          votes: 0,
+          comment_count: 0,
+        });
+      });
+  });
+  test("201: Article image URL defaults to null if not provided", () => {
+    const newArticle = {
+      author: "lurker",
+      title: "More latest stuff",
+      body: "This is also a new article...",
+      topic: "mitch",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(201)
+      .then(({ body: { article } }) => {
+        expect(article.article_img_url).toBe(null);
+      });
+  });
+  test("404: Responds with appropriate error message when nonexistent topic", () => {
+    const newArticle = {
+      author: "lurker",
+      title: "Even more latest stuff",
+      body: "This wanted to be a new article...",
+      topic: 123,
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(404)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Topic not found");
+      });
+  });
+  test("401: Responds with appropriate error message when author isn't a current user", () => {
+    const newArticle = {
+      author: 123,
+      title: "Loads more latest stuff",
+      body: "This had hoped to be a new article...",
+      topic: "mitch",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(401)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Unable to identify user");
+      });
+  });
+  test("400: Responds with appropriate error message when request body is incomplete", () => {
+    const newArticle = {
+      body: "This was, at one point, a new article...",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id", () => {
   test("200: Responds with article object with correct article id and properties", () => {
     return request(app)
