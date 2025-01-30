@@ -31,6 +31,23 @@ exports.insertComment = ({ username, body }, { article_id }) => {
     });
 };
 
+exports.updateComment = ({ comment_id }, { inc_votes }) => {
+  return checkValueExists({ comment_id })
+    .then(() => {
+      const sql = `SELECT votes FROM comments WHERE comment_id = $1;`;
+      return sqlReturnItem(sql, [comment_id]);
+    })
+    .then(({ votes }) => {
+      const updatedVotes = votes + inc_votes;
+      const sql = `UPDATE comments 
+      SET votes = $1
+      WHERE comment_id = $2
+      RETURNING *;`;
+      args = [updatedVotes, comment_id];
+      return sqlReturnItem(sql, args);
+    });
+};
+
 exports.deleteCommentFromDb = ({ comment_id }) => {
   return checkValueExists({ comment_id }).then(() => {
     const sql = `DELETE FROM 
