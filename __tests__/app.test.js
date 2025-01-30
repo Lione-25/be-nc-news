@@ -230,8 +230,8 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(error).toBe("Bad request");
       });
   });
-  test("400: Responds with appropriate error message when request body is incomplete", () => {
-    const update = {};
+  test("400: Responds with appropriate error message when request body does not have inc_votes property", () => {
+    const update = { inccc_votes: 6 };
     return request(app)
       .patch("/api/articles/4")
       .send(update)
@@ -240,7 +240,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(error).toBe("Bad request");
       });
   });
-  test("400: Responds with appropriate error message when request body has invalid sql syntax", () => {
+  test("400: Responds with appropriate error message when value of inc_votes has invalid syntax", () => {
     const update = { inc_votes: "seven" };
     return request(app)
       .patch("/api/articles/4")
@@ -374,6 +374,76 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/4/comments")
       .send(newComment)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: Responds with updated comment object", () => {
+    const update = { inc_votes: 7 };
+    return request(app)
+      .patch("/api/comments/5")
+      .send(update)
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          comment_id: 5,
+          body: "I hate streaming noses",
+          article_id: 1,
+          author: "icellusedkars",
+          votes: 7,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("200: Votes are incremented correctly when there are preexisting votes", () => {
+    const update = { inc_votes: -10 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(update)
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment.votes).toBe(6);
+      });
+  });
+  test("404: Responds with appropriate error message when nonexistent comment id", () => {
+    const update = { inc_votes: -3 };
+    return request(app)
+      .patch("/api/comments/9000")
+      .send(update)
+      .expect(404)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Comment not found");
+      });
+  });
+  test("400: Responds with appropriate error message when invalid comment id", () => {
+    const update = { inc_votes: 2 };
+    return request(app)
+      .patch("/api/comments/banana")
+      .send(update)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+  test("400: Responds with appropriate error message when request body does not have inc_votes property", () => {
+    const update = {};
+    return request(app)
+      .patch("/api/comments/4")
+      .send(update)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+  test("400: Responds with appropriate error message when value of inc_votes has invalid syntax", () => {
+    const update = { inc_votes: "seven" };
+    return request(app)
+      .patch("/api/comments/4")
+      .send(update)
       .expect(400)
       .then(({ body: { error } }) => {
         expect(error).toBe("Bad request");
