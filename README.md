@@ -4,7 +4,7 @@ This is an API for the purpose of accessing application data programmatically.
 The data consists of articles, topics, comments and users.
 The intention is to mimic the building of a real world backend service (such as Reddit) which should provide this information to the front end architecture.
 
-[View the hosted version of this project here](https://nc-news-abj5.onrender.com/api){:target="_blank"}
+[View the hosted version of this project here](https://nc-news-abj5.onrender.com/api) {:target="_blank"}
 
 To run this project locally, please refer to the following instructions:
 
