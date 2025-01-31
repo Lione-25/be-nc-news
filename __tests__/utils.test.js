@@ -3,7 +3,11 @@ const {
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
-const { getCommentCount, checkValueExists } = require("../models/utils");
+const {
+  getCommentCount,
+  checkValueExists,
+  formatArticlesPage,
+} = require("../models/utils");
 const db = require("../db/connection");
 
 afterAll(() => {
@@ -183,6 +187,39 @@ describe("checkValueExists", () => {
         msg: "Topic not found",
         status: 404,
       });
+    });
+  });
+});
+
+describe("formatArticlesPage", () => {
+  test("returns correctly formatted response body containing articles property and total_count property", () => {
+    const articles = [
+      { author: "xgh", title: "ghb", total_count: 15 },
+      { author: "jksf", title: "interesting", total_count: 15 },
+    ];
+    const expectedResponse = {
+      total_count: 15,
+      articles: [
+        { author: "xgh", title: "ghb" },
+        { author: "jksf", title: "interesting" },
+      ],
+    };
+    expect(formatArticlesPage(articles)).toEqual(expectedResponse);
+  });
+  test("removes total_count property from individual article objects", () => {
+    const inputArticles = [
+      { title: "cool", total_count: 4 },
+      { title: "hello", total_count: 4 },
+    ];
+    const { articles } = formatArticlesPage(inputArticles);
+    articles.forEach((article) => {
+      expect(article.hasOwnProperty("total_count")).toBe(false);
+    });
+  });
+  test("returns rejected promise with correct error object if passed empty page", () => {
+    return expect(formatArticlesPage([])).rejects.toMatchObject({
+      msg: "Page not found",
+      status: 404,
     });
   });
 });
