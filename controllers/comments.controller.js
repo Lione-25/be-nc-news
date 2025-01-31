@@ -5,10 +5,10 @@ const {
   updateComment,
 } = require("../models/comments.model");
 
-exports.getComments = ({ params }, res, next) => {
-  selectComments(params)
+exports.getComments = ({ params, query }, res, next) => {
+  selectComments(params, query)
     .then((comments) => {
-      res.status(200).send({ comments });
+      res.status(200).send(comments);
     })
     .catch((err) => {
       next(err);

@@ -1,15 +1,31 @@
 const db = require("../db/connection");
-const { checkValueExists, sqlReturnTable, sqlReturnItem } = require("./utils");
+const {
+  checkValueExists,
+  sqlReturnTable,
+  sqlReturnItem,
+  formatPageOfItems,
+  testPageQueries,
+} = require("./utils");
 
-exports.selectComments = ({ article_id }) => {
-  return checkValueExists({ article_id }).then(() => {
-    const sql = `SELECT * FROM 
+exports.selectComments = ({ article_id }, { limit = 10, p = 1 }) => {
+  return checkValueExists({ article_id })
+    .then(() => {
+      return testPageQueries(limit, p);
+    })
+    .then(() => {
+      const offset = p * limit - limit;
+      const sql = `SELECT * , COUNT(*) OVER() ::INT AS total_count FROM 
         comments 
         WHERE article_id = $1
-        ORDER BY created_at DESC;`;
-
-    return sqlReturnTable(sql, [article_id]);
-  });
+        ORDER BY created_at DESC
+        LIMIT ${limit} 
+        OFFSET ${offset};`;
+      return sqlReturnTable(sql, [article_id]).then((comments) => {
+        if (comments.length === 0 && p === 1) {
+          return { comments, total_count: 0 };
+        } else return formatPageOfItems(comments, "comments");
+      });
+    });
 };
 
 exports.insertComment = ({ username, body }, { article_id }) => {

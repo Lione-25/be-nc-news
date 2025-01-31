@@ -4,9 +4,9 @@ const {
   formatComments,
 } = require("../db/seeds/utils");
 const {
-  getCommentCount,
   checkValueExists,
-  formatArticlesPage,
+  formatPageOfItems,
+  testPageQueries,
 } = require("../models/utils");
 const db = require("../db/connection");
 
@@ -115,9 +115,9 @@ describe("formatComments", () => {
 
 describe("checkValueExists", () => {
   test("returns a promise", () => {
-    // return expect(
-    //   checkValueExists({ username: "lurker" }) instanceof Promise
-    // ).toBe(true);
+    return expect(
+      checkValueExists({ username: "lurker" }) instanceof Promise
+    ).toBe(true);
   });
   test("rejects when passed incorrectly formatted argument", () => {
     return expect(checkValueExists({ userr: "lurker" })).rejects.toMatchObject({
@@ -127,7 +127,9 @@ describe("checkValueExists", () => {
   });
   describe("username:", () => {
     test("resolves if username exists", () => {
-      return expect(checkValueExists({ username: "lurker" })).resolves.toBe();
+      return expect(checkValueExists({ username: "lurker" })).resolves.toBe(
+        "all is well"
+      );
     });
     test("rejects with correct error object if username doesn't exist", () => {
       return expect(
@@ -140,7 +142,9 @@ describe("checkValueExists", () => {
   });
   describe("article:", () => {
     test("resolves if article exists", () => {
-      return expect(checkValueExists({ article_id: 11 })).resolves.toBe();
+      return expect(checkValueExists({ article_id: 11 })).resolves.toBe(
+        "all is well"
+      );
     });
     test("rejects with correct error object if article doesn't exist", () => {
       return expect(
@@ -160,7 +164,9 @@ describe("checkValueExists", () => {
   });
   describe("comment:", () => {
     test("resolves if comment exists", () => {
-      return expect(checkValueExists({ comment_id: "6" })).resolves.toBe();
+      return expect(checkValueExists({ comment_id: "6" })).resolves.toBe(
+        "all is well"
+      );
     });
     test("rejects with correct error object if comment doesn't exist", () => {
       return expect(
@@ -180,7 +186,9 @@ describe("checkValueExists", () => {
   });
   describe("topic:", () => {
     test("resolves if topic exists", () => {
-      return expect(checkValueExists({ topic: "paper" })).resolves.toBe();
+      return expect(checkValueExists({ topic: "paper" })).resolves.toBe(
+        "all is well"
+      );
     });
     test("rejects with correct error object if topic doesn't exist", () => {
       return expect(checkValueExists({ topic: "haha" })).rejects.toMatchObject({
@@ -191,35 +199,69 @@ describe("checkValueExists", () => {
   });
 });
 
-describe("formatArticlesPage", () => {
-  test("returns correctly formatted response body containing articles property and total_count property", () => {
-    const articles = [
+describe("formatPageOfItems", () => {
+  test("returns correctly formatted response body containing items property and total_count property", () => {
+    const items = [
       { author: "xgh", title: "ghb", total_count: 15 },
       { author: "jksf", title: "interesting", total_count: 15 },
     ];
     const expectedResponse = {
       total_count: 15,
-      articles: [
+      items: [
         { author: "xgh", title: "ghb" },
         { author: "jksf", title: "interesting" },
       ],
     };
-    expect(formatArticlesPage(articles)).toEqual(expectedResponse);
+    expect(formatPageOfItems(items)).toEqual(expectedResponse);
   });
-  test("removes total_count property from individual article objects", () => {
-    const inputArticles = [
+  test("removes total_count property from individual items", () => {
+    const inputItems = [
       { title: "cool", total_count: 4 },
       { title: "hello", total_count: 4 },
     ];
-    const { articles } = formatArticlesPage(inputArticles);
-    articles.forEach((article) => {
-      expect(article.hasOwnProperty("total_count")).toBe(false);
+    const { items } = formatPageOfItems(inputItems);
+    items.forEach((item) => {
+      expect(item.hasOwnProperty("total_count")).toBe(false);
     });
   });
+  test("accepts item name as an argument, assigning items array to correct property key in response object", () => {
+    const inputItems = [
+      { title: "cool", total_count: 4 },
+      { title: "hello", total_count: 4 },
+    ];
+
+    const articlesOutput = formatPageOfItems(inputItems, "articles");
+    const { articles } = articlesOutput;
+    expect(articles).toEqual([{ title: "cool" }, { title: "hello" }]);
+    expect(articlesOutput.hasOwnProperty("items")).toBe(false);
+
+    const commentsOutput = formatPageOfItems(inputItems, "comments");
+    const { comments } = commentsOutput;
+    expect(comments).toEqual([{ title: "cool" }, { title: "hello" }]);
+    expect(commentsOutput.hasOwnProperty("items")).toBe(false);
+  });
   test("returns rejected promise with correct error object if passed empty page", () => {
-    return expect(formatArticlesPage([])).rejects.toMatchObject({
+    return expect(formatPageOfItems([])).rejects.toMatchObject({
       msg: "Page not found",
       status: 404,
     });
+  });
+});
+
+describe("testPageQueries", () => {
+  test("rejects with correct error if limit is not a number", () => {
+    return expect(testPageQueries("seven")).rejects.toMatchObject({
+      status: 400,
+      msg: "Invalid query values",
+    });
+  });
+  test("rejects with correct error if page is not a number", () => {
+    return expect(testPageQueries(5, "six")).rejects.toMatchObject({
+      status: 400,
+      msg: "Invalid query values",
+    });
+  });
+  test("resolves if limit and page are both numbers", () => {
+    return expect(testPageQueries(2, "5")).resolves.toBe("all is well");
   });
 });

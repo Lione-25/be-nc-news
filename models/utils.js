@@ -36,6 +36,7 @@ exports.checkValueExists = ({ username, article_id, comment_id, topic }) => {
     if (rows.length === 0) {
       return Promise.reject({ msg: `${itemName} not found`, status: 404 });
     }
+    return Promise.resolve("all is well");
   });
 };
 
@@ -51,17 +52,47 @@ exports.sqlReturnItem = (sql, args) => {
   });
 };
 
-exports.formatArticlesPage = (articles) => {
-  if (articles.length === 0) {
+exports.formatPageOfItems = (items, itemName) => {
+  if (items.length === 0) {
     return Promise.reject({
       status: 404,
       msg: "Page not found",
     });
   }
-  const total_count = articles[0].total_count;
-  const formattedArticles = articles.map((article) => {
-    delete article.total_count;
-    return article;
+  const total_count = items[0].total_count;
+  const formattedItems = items.map((item) => {
+    delete item.total_count;
+    return item;
   });
-  return { total_count, articles: formattedArticles };
+  if (itemName === "articles") {
+    return { total_count, articles: formattedItems };
+  }
+  if (itemName === "comments") {
+    return { total_count, comments: formattedItems };
+  }
+  return { total_count, items: formattedItems };
 };
+
+exports.queryError = () => {
+  return Promise.reject({
+    status: 400,
+    msg: "Invalid query values",
+  });
+};
+
+exports.testPageQueries = (limit, p) => {
+  const numberRegex = /^\d+$/;
+  if (!numberRegex.test(limit) || !numberRegex.test(p)) {
+    return this.queryError();
+  }
+  return Promise.resolve("all is well");
+};
+
+// exports.testArticleSortQueries = (sort_by, order) => {
+//   if (
+//     !validSortQueries.sort_by.includes(sort_by) ||
+//     !validSortQueries.order.includes(order)
+//   ) {
+//     return this.queryError;
+//   }
+// };

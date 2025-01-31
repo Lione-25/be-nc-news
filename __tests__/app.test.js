@@ -143,15 +143,6 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  // test("200: Responds with correct page of article objects if the requested page is empty", () => {
-  //   return request(app)
-  //     .get("/api/articles?p=3")
-  //     .expect(200)
-  //     .then(({ body: { articles, total_count } }) => {
-  //       expect(articles.length).toBe(0);
-  //       expect(total_count).toBe(13);
-  //     });
-  // });
   test("200: Responds with total_count property displaying correct total number of articles", () => {
     return request(app)
       .get("/api/articles")
@@ -427,7 +418,7 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
   test("200: Responds with comments sorted by date in descending order", () => {
     return request(app)
-      .get("/api/articles/1/comments")
+      .get("/api/articles/1/comments?limit=15")
       .expect(200)
       .then(({ body: { comments } }) => {
         expect(comments.length).toBe(11);
@@ -443,6 +434,50 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments.length).toBe(0);
       });
   });
+  test("200: Responds with comments paginated with default limit of 10 per page", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(10);
+      });
+  });
+  test("200: Responds with comments paginated according to value of limit query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=2")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(2);
+      });
+  });
+  test("200: Responds with correct page of comments according to value of limit and page query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=3&p=2")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(3);
+        const expectedCommentIds = [13, 7, 8];
+        comments.forEach((comment, index) => {
+          expect(comment.comment_id).toBe(expectedCommentIds[index]);
+        });
+      });
+  });
+  test("200: Responds with total_count property displaying correct total number of comments", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { total_count } }) => {
+        expect(total_count).toBe(11);
+      });
+  });
+  // test("200: Total count property takes into account any filtering queries", () => {
+  //   return request(app)
+  //     .get("/api/articles/1/comments?author=lurker")
+  //     .expect(200)
+  //     .then(({ body: { total_count } }) => {
+  //       expect(total_count).toBe(2);
+  //     });
+  // });
   test("404: Responds with appropriate error message when nonexistent article id", () => {
     return request(app)
       .get("/api/articles/90/comments")
@@ -457,6 +492,22 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body: { error } }) => {
         expect(error).toBe("Bad request");
+      });
+  });
+  test("404: Responds with appropriate error message when requested page (other than page 1) has no content", () => {
+    return request(app)
+      .get("/api/articles/3/comments?p=3")
+      .expect(404)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Page not found");
+      });
+  });
+  test("400: Responds with appropriate error message when invalid page query values", () => {
+    return request(app)
+      .get("/api/articles/2/comments?limit=five&p=one")
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Invalid query values");
       });
   });
 });

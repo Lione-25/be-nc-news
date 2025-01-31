@@ -2,8 +2,9 @@ const {
   checkValueExists,
   sqlReturnItem,
   sqlReturnTable,
-  getCommentCount,
-  formatArticlesPage,
+  formatPageOfItems,
+  queryError,
+  testPageQueries,
 } = require("./utils");
 
 exports.selectArticle = ({ article_id }) => {
@@ -47,19 +48,14 @@ exports.selectAllArticles = async ({
     order: ["asc", "desc"],
   };
 
-  const numberRegex = /^\d+$/;
-
   if (
     !validSortQueries.sort_by.includes(sort_by) ||
-    !validSortQueries.order.includes(order) ||
-    !numberRegex.test(limit) ||
-    !numberRegex.test(p)
+    !validSortQueries.order.includes(order)
   ) {
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid query values",
-    });
+    return queryError();
   }
+
+  await testPageQueries(limit, p);
 
   const sqlBase = `SELECT 
   article_id, 
@@ -73,21 +69,24 @@ exports.selectAllArticles = async ({
   FROM 
   articles`;
 
+  let sqlCondition = "";
+
   const offset = p * limit - limit;
   const sqlEnd = ` ORDER BY ${sort_by} ${order} LIMIT ${limit} OFFSET ${offset}`;
 
-  let sql = sqlBase + sqlEnd;
   const args = [];
 
   if (topic) {
-    const sqlCondition = " WHERE topic = $1";
-    sql = sqlBase + sqlCondition + sqlEnd;
+    sqlCondition = " WHERE topic = $1";
     args.push(topic);
     await checkValueExists({ topic });
   }
 
+  const sql = sqlBase + sqlCondition + sqlEnd;
+
   const articles = await sqlReturnTable(sql, args);
-  return formatArticlesPage(articles);
+
+  return formatPageOfItems(articles, "articles");
 };
 
 exports.updateArticle = ({ article_id }, { inc_votes }) => {
