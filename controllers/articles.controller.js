@@ -18,7 +18,7 @@ exports.getArticle = ({ params }, res, next) => {
 exports.getAllArticles = ({ query }, res, next) => {
   selectAllArticles(query)
     .then((articles) => {
-      res.status(200).send({ articles });
+      res.status(200).send(articles);
     })
     .catch((err) => {
       next(err);

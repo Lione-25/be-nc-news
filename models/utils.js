@@ -50,3 +50,18 @@ exports.sqlReturnItem = (sql, args) => {
     return rows[0];
   });
 };
+
+exports.formatArticlesPage = (articles) => {
+  if (articles.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "Page not found",
+    });
+  }
+  const total_count = articles[0].total_count;
+  const formattedArticles = articles.map((article) => {
+    delete article.total_count;
+    return article;
+  });
+  return { total_count, articles: formattedArticles };
+};

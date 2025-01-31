@@ -3,6 +3,7 @@ const {
   sqlReturnItem,
   sqlReturnTable,
   getCommentCount,
+  formatArticlesPage,
 } = require("./utils");
 
 exports.selectArticle = ({ article_id }) => {
@@ -26,10 +27,12 @@ exports.selectArticle = ({ article_id }) => {
   });
 };
 
-exports.selectAllArticles = ({
+exports.selectAllArticles = async ({
   sort_by = "created_at",
   order = "desc",
   topic,
+  limit = 10,
+  p = 1,
 }) => {
   const validSortQueries = {
     sort_by: [
@@ -44,9 +47,13 @@ exports.selectAllArticles = ({
     order: ["asc", "desc"],
   };
 
+  const numberRegex = /^\d+$/;
+
   if (
-    validSortQueries.sort_by.includes(sort_by) === false ||
-    validSortQueries.order.includes(order) === false
+    !validSortQueries.sort_by.includes(sort_by) ||
+    !validSortQueries.order.includes(order) ||
+    !numberRegex.test(limit) ||
+    !numberRegex.test(p)
   ) {
     return Promise.reject({
       status: 400,
@@ -61,22 +68,26 @@ exports.selectAllArticles = ({
   topic, 
   created_at, 
   votes, 
-  article_img_url 
+  article_img_url, 
+  COUNT(*) OVER() ::INT AS total_count
   FROM 
   articles`;
-  const sqlOrder = ` ORDER BY ${sort_by} ${order};`;
-  let sql = sqlBase + sqlOrder;
+
+  const offset = p * limit - limit;
+  const sqlEnd = ` ORDER BY ${sort_by} ${order} LIMIT ${limit} OFFSET ${offset}`;
+
+  let sql = sqlBase + sqlEnd;
   const args = [];
 
   if (topic) {
     const sqlCondition = " WHERE topic = $1";
-    sql = sqlBase + sqlCondition + sqlOrder;
+    sql = sqlBase + sqlCondition + sqlEnd;
     args.push(topic);
-    return checkValueExists({ topic }).then(() => {
-      return sqlReturnTable(sql, args);
-    });
+    await checkValueExists({ topic });
   }
-  return sqlReturnTable(sql, args);
+
+  const articles = await sqlReturnTable(sql, args);
+  return formatArticlesPage(articles);
 };
 
 exports.updateArticle = ({ article_id }, { inc_votes }) => {
