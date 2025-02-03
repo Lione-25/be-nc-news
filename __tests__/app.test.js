@@ -52,6 +52,62 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("POST /api/topics", () => {
+  test("201: Responds with the newly added topic", () => {
+    const newTopic = {
+      slug: "super",
+      description: "This is a new topic...",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(201)
+      .then(({ body: { topic } }) => {
+        expect(topic).toMatchObject({
+          slug: "super",
+          description: "This is a new topic...",
+        });
+      });
+  });
+  test("201: Topic description is not necessary", () => {
+    const newTopic = {
+      slug: "self-explanatory",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(201)
+      .then(({ body: { topic } }) => {
+        expect(topic.slug).toBe("self-explanatory");
+      });
+  });
+  test("400: Responds with appropriate error message when topic already exists", () => {
+    const newTopic = {
+      slug: "mitch",
+      description: "This had hoped to be a new topic...",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Topic already exists");
+      });
+  });
+  test("400: Responds with appropriate error message when request body is incomplete", () => {
+    const newTopic = {
+      description: "This was, at one point, a new topic...",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(400)
+      .then(({ body: { error } }) => {
+        expect(error).toBe("Bad request");
+      });
+  });
+});
+
 describe("GET /api/articles", () => {
   test("200: Responds with an array of article objects without a body property", () => {
     return request(app)
