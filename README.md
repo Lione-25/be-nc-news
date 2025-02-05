@@ -1,8 +1,13 @@
 # Northcoders News API
 
-This is an API for the purpose of accessing application data programmatically.
-The data consists of articles, topics, comments and users.
-The intention is to mimic the building of a real world backend service (such as Reddit) which should provide this information to the front end architecture.
+Northcoders News API is a backend service built using Node.js, Express, and PostgreSQL, designed to simulate a real-world API similar to Reddit. This project provides a set of RESTful endpoints to programmatically access and manage data for topics, articles, comments, and users.
+
+#### Key Features:
+- Endpoints for retrieving and managing topics, articles, comments, and users.
+- Advanced query functionality, including filtering, sorting, and pagination for articles.
+- Designed with Test-Driven Development (TDD) to ensure robust and reliable functionality.
+- High code quality maintained through Git workflows, feature branching, and Husky pre-commit hooks.
+This project demonstrates backend development skills, database management, and RESTful API design, providing a strong foundation for scalable and maintainable applications.
 
 [View the hosted version of this project here](https://nc-news-abj5.onrender.com/api)
 
