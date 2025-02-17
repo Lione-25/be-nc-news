@@ -1,10 +1,14 @@
 const express = require("express");
 
+const cors = require("cors");
+
 const apiRouter = require("./routes/api-router");
 
 const { endpointNotFound } = require("./controllers/endpoints.controller");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
