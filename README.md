@@ -4,7 +4,7 @@ Northcoders News API is a backend service built using Node.js, Express, and Post
 
 #### Key Features:
 - Endpoints for retrieving and managing topics, articles, comments, and users.
-- Advanced query functionality, including filtering, sorting, and pagination for articles.
+- Advanced query functionality, including filtering, sorting, and pagination.
 - Designed with Test-Driven Development (TDD) to ensure robust and reliable functionality.
 - High code quality maintained through Git workflows, feature branching, and Husky pre-commit hooks.
 
